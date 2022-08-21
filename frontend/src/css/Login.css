@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Titillium+Web:wght@300&display=swap");
+
+body {
+  background: #0079f5;
+}
+
+.form_container {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  top: 40px;
+  bottom: 40px;
+  transform: translateY(-3%);
+}
+
+.input {
+  width: 75%;
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-size: 40px;
+  font-family: "Pacifico", cursive;
+}
