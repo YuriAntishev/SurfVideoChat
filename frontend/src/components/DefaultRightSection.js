@@ -1,5 +1,5 @@
 import React from "react";
-import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 
 const DefaultRightSection = () => {
   return (

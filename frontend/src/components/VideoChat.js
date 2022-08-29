@@ -1,77 +1,82 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import "../css/VideoChat.css";
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import ActiveRightSection from "./ActiveRightSection";
 import DefaultRightSection from "./DefaultRightSection";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { io } from "socket.io-client";
-import Peer from 'simple-peer';
+import Peer from "simple-peer";
 
-const socket = io("http://localhost:8000/")
+// const socket = io("http://localhost:8000/");
 
 function VideoChat(props) {
   const { push } = useHistory();
   const [active, setActive] = useState(null);
-
+  const [availableUsers, setAvailableUsers] = useState([]);
+  console.log("first999");
   // socket-client
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [stream, setStream] = useState();
   // const [name, setName] = useState('');
   const [call, setCall] = useState({});
-  const [me, setMe] = useState('');
+  const [me, setMe] = useState("");
 
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
 
-  // 
+  console.log("availableUsers", availableUsers);
 
-  const url = "http://localhost:8000/"
-  const username = localStorage.getItem("username");
+  const url = "http://localhost:8000/";
+  const username = sessionStorage.getItem("username");
 
-  console.log('username555', username)
+  console.log("username555", username);
 
   const socketRef = useRef();
 
   useEffect(() => {
-
     socketRef.current = io(url, {
-      query: { username }
+      path: "/videochat/",
+      query: { username, room: "surfchat" },
     });
 
-//     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//       .then((currentStream) => {
-//         setStream(currentStream);
-// console.log('currentStream', currentStream)
-//         myVideo.current.srcObject = currentStream;
-//       });
+    socketRef.current.on("allUsersData", ({ users }) => {
+      setAvailableUsers(users);
+    });
+
+    //     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //       .then((currentStream) => {
+    //         setStream(currentStream);
+    // console.log('currentStream', currentStream)
+    //         myVideo.current.srcObject = currentStream;
+    //       });
 
     // socket.on('me', (id) => setMe(id));
 
     // socket.on('callUser', ({ from, name: callerName, signal }) => {
     //   setCall({ isReceivingCall: true, from, name: callerName, signal });
     // });
-  }, [])
+  }, [username]);
 
-  // const answerCall = () => {
-  //   setCallAccepted(true);
+  const answerCall = () => {
+    setCallAccepted(true);
 
-  //   const peer = new Peer({ initiator: false, trickle: false, stream });
+    const peer = new Peer({ initiator: false, trickle: false, stream });
 
-  //   peer.on('signal', (data) => {
-  //     socket.emit('answerCall', { signal: data, to: call.from });
-  //   });
+    peer.on('signal', (data) => {
+      socketRef.current.emit('answerCall', { signal: data, to: call.from });
+    });
 
-  //   peer.on('stream', (currentStream) => {
-  //     userVideo.current.srcObject = currentStream;
-  //   });
+    peer.on('stream', (currentStream) => {
+      userVideo.current.srcObject = currentStream;
+    });
 
-  //   peer.signal(call.signal);
+    peer.signal(call.signal);
 
-  //   connectionRef.current = peer;
-  //  }
+    connectionRef.current = peer;
+   }
 
   // const callUser = (id) => {
   //   const peer = new Peer({ initiator: true, trickle: false, stream });
@@ -101,14 +106,6 @@ function VideoChat(props) {
   //   window.location.reload();
   // };
 
-  // socket-client
-
-  const users = [
-    { id: 1, name: "Johnatan Smith" },
-    { id: 2, name: "Steve Pate" },
-    { id: 3, name: "Krishna Shivram" },
-  ];
-
   const LogOut = () => {
     push("/");
   };
@@ -134,15 +131,16 @@ function VideoChat(props) {
             <h3 className="middle-section-title">Active Users</h3>
 
             <ul className="users-list">
-              {users.map((item) => (
-                <li key={item.id} className="users-list-nav-item">
+              {availableUsers?.map((i, index) => (
+                <li key={index} className="users-list-nav-item">
                   <Link
-                    to={`${item.name.replace(/\s+/g, "").trim()}`}
-                    className={`users-list-nav-link ${active === item.id && "active"
-                      }`}
-                    onClick={() => setActive(item.id)}
+                    to={`${i.name.replace(/\s+/g, "").trim()}`}
+                    className={`users-list-nav-link ${
+                      active === i.id && "active"
+                    }`}
+                    onClick={() => setActive(i.id)}
                   >
-                    {item.name}
+                  {i.name}
                   </Link>
                 </li>
               ))}
@@ -154,8 +152,8 @@ function VideoChat(props) {
               path="/:name"
               component={(props) => (
                 <ActiveRightSection
-                myVideo={myVideo}
-                  users={users}
+                  myVideo={myVideo}
+                  users={availableUsers}
                   setActive={setActive}
                   {...props}
                 />

@@ -63,15 +63,14 @@ const ActiveRightSection = (props) => {
   const [playing, setPlaying] = useState(false);
 
   if (playing) {
-    melody.play()
+    melody.play();
   } else {
     melody.pause();
   }
 
   const handleAccept = async () => {
-    await setPlaying(false);
-    await setOpen(false);
-    await push(`StevePate`);
+    setPlaying(false);
+    setOpen(false);
     melody.currentTime = 0;
   };
 
@@ -141,14 +140,14 @@ const ActiveRightSection = (props) => {
         <h2 className="head-text">
           Here you will see a video image of a person with whom you will talk
         </h2>
-        <video 
-        style={{
-          width: 250,
-        }}
-        playsInline 
-        muted 
-        ref={props.myVideo} 
-        autoPlay 
+        <video
+          style={{
+            width: 250,
+          }}
+          playsInline
+          muted
+          ref={props.myVideo}
+          autoPlay
         />
       </div>
     </div>

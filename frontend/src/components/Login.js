@@ -29,7 +29,7 @@ export default function Login() {
       setError("Please, enter your name!");
       return null;
     }
-    localStorage.setItem("username", username);
+    sessionStorage.setItem("username", username);
     push("/videochat");
   };
 
